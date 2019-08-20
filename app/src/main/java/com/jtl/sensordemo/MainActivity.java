@@ -8,10 +8,13 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.socks.library.KLog;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.List;
 
 public class MainActivity extends Activity implements SensorEventListener {
@@ -42,6 +45,15 @@ public class MainActivity extends Activity implements SensorEventListener {
         KLog.e("Sensor", "temperature:" + temperature);
         mCpuSensorText.setText("是否支持Cpu温度Sensor："+ cpuTemperature);
         mSensorText.setText("是否支持普通温度Sensor：" + temperature);
+
+        mSensorText.setText(getCputemp()+"\n"+getCputemp7());
+
+        mSensorText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSensorText.setText(getCputemp()+"\n"+getCputemp7());
+            }
+        });
     }
 
     @Override
@@ -73,5 +85,47 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private float getTemperatureC(float temperature) {
         return (float) (Math.round(temperature * 10)) / 10;
+    }
+
+    private String getCputemp(){
+        String path = "/sys/class/thermal/thermal_zone0/temp";
+        StringBuffer sb = new StringBuffer();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(path));
+            String readline = "";
+
+            while ((readline = br.readLine()) != null) {
+                System.out.println("readline:" + readline);
+                sb.append(readline);
+            }
+            br.close();
+            KLog.d("Bradley", "onCreate: "+sb.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    private String getCputemp7(){
+        String path = "/sys/class/thermal/thermal_zone7/temp";
+        StringBuffer sb = new StringBuffer();
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(path));
+            String readline = "";
+
+            while ((readline = br.readLine()) != null) {
+                System.out.println("readline:" + readline);
+                sb.append(readline);
+            }
+            br.close();
+            KLog.d("Bradley", "onCreate: "+sb.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
     }
 }
